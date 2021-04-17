@@ -1,0 +1,346 @@
+Annotation:
+
+# To Download the ANNOVAR software for annotation of variants, we generate this command:
+
+(base) ubuntu@mai:~$ wget http://www.openbioinformatics.org/annovar/download/0wgxR2rIVP/annovar.latest.tar.gz
+--2021-04-08 19:06:07--  http://www.openbioinformatics.org/annovar/download/0wgxR2rIVP/annovar.latest.tar.gz
+Resolving www.openbioinformatics.org (www.openbioinformatics.org)... 67.205.156.247
+Connecting to www.openbioinformatics.org (www.openbioinformatics.org)|67.205.156.247|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 141660305 (135M) [application/x-gzip]
+Saving to: ‘annovar.latest.tar.gz’
+
+annovar.latest.tar.gz            100%[=======================================================>] 135.10M  24.6MB/s    in 5.7s
+
+2021-04-08 19:06:12 (23.8 MB/s) - ‘annovar.latest.tar.gz’ saved [141660305/141660305]
+
+# To unpack annovar.latest.tar.gz file, we generate the command below:
+
+(base) ubuntu@mai:~$ tar -zxvf annovar.latest.tar.gz
+annovar/
+annovar/example/
+annovar/example/ex1.avinput
+annovar/example/example.simple_region
+annovar/example/example.tab_region
+annovar/example/ex2.vcf
+annovar/example/grantham.matrix
+annovar/example/snplist.txt
+annovar/example/README
+annovar/example/gene_xref.txt
+annovar/example/gene_fullxref.txt
+annovar/humandb/
+annovar/humandb/hg19_refGene.txt
+annovar/humandb/hg19_refGeneMrna.fa
+annovar/humandb/hg19_refGeneVersion.txt
+annovar/humandb/hg19_refGeneWithVer.txt
+annovar/humandb/hg19_refGeneWithVerMrna.fa
+annovar/humandb/hg19_example_db_generic.txt
+annovar/humandb/hg19_example_db_gff3.txt
+annovar/humandb/GRCh37_MT_ensGene.txt
+annovar/humandb/GRCh37_MT_ensGeneMrna.fa
+annovar/humandb/hg19_MT_ensGene.txt
+annovar/humandb/hg19_MT_ensGeneMrna.fa
+annovar/humandb/genometrax-sample-files-gff/
+annovar/humandb/genometrax-sample-files-gff/list
+annovar/humandb/genometrax-sample-files-gff/sample_chip_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_common_snp_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_cosmic_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_cpg_islands_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_dbnsfp_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_disease_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_dnase_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_drug_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_evs_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_gwas_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_hgmd_common_snp_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_hgmd_disease_genes_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_hgmd_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_hgmdimputed_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_miRNA_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_microsatellites_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_omim_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_pathway_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_pgx_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_ptms_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_snps_dbsnp_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_snps_ensembl_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_transfac_sites_featuretype_hg19.gff
+annovar/humandb/genometrax-sample-files-gff/sample_tss_featuretype_hg19.gff
+annovar/annotate_variation.pl
+annovar/table_annovar.pl
+annovar/convert2annovar.pl
+annovar/retrieve_seq_from_fasta.pl
+annovar/coding_change.pl
+annovar/variants_reduction.pl
+
+#The following commands were used to download the databases that used for annoation the variants via ANNOVAR software:
+
+(base) ubuntu@mai:~$ cd annovar
+(base) ubuntu@mai:~/annovar$ ./annotate_variation.pl -buildver hg19 -downdb -webfrom annovar knownGene humandb/
+NOTICE: Web-based checking to see whether ANNOVAR new version is available ... Done
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_knownGene.txt.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_kgXref.txt.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_knownGeneMrna.fa.gz ... OK
+NOTICE: Uncompressing downloaded files
+NOTICE: Finished downloading annotation files for hg19 build version, with files saved at the 'humandb' directory
+(base) ubuntu@mai:~/annovar$ ./annotate_variation.pl -buildver hg19 -downdb -webfrom annovar refGene humandb/
+NOTICE: Web-based checking to see whether ANNOVAR new version is available ... Done
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_refGene.txt.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_refGeneMrna.fa.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_refGeneVersion.txt.gz ... OK
+NOTICE: Uncompressing downloaded files
+NOTICE: Finished downloading annotation files for hg19 build version, with files saved at the 'humandb' directory
+(base) ubuntu@mai:~/annovar$ ./annotate_variation.pl -buildver hg19 -downdb -webfrom annovar ensGene humandb/
+NOTICE: Web-based checking to see whether ANNOVAR new version is available ... Done
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_ensGene.txt.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_ensGeneMrna.fa.gz ... OK
+NOTICE: Uncompressing downloaded files
+NOTICE: Finished downloading annotation files for hg19 build version, with files saved at the 'humandb' directory
+(base) ubuntu@mai:~/annovar$ ./annotate_variation.pl -buildver hg19 -downdb -webfrom annovar clinvar_20180603 humandb/
+NOTICE: Web-based checking to see whether ANNOVAR new version is available ... Done
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20180603.txt.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20180603.txt.idx.gz ... OK
+NOTICE: Uncompressing downloaded files
+NOTICE: Finished downloading annotation files for hg19 build version, with files saved at the 'humandb' directory
+(base) ubuntu@mai:~/annovar$ ./annotate_variation.pl -buildver hg19 -downdb -webfrom annovar exac03 humandb/
+NOTICE: Web-based checking to see whether ANNOVAR new version is available ... Done
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_exac03.txt.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_exac03.txt.idx.gz ... OK
+NOTICE: Uncompressing downloaded files
+NOTICE: Finished downloading annotation files for hg19 build version, with files saved at the 'humandb' directory
+(base) ubuntu@mai:~/annovar$ ./annotate_variation.pl -buildver hg19 -downdb -webfrom annovar dbnsfp31a_interpro humandb/
+NOTICE: Web-based checking to see whether ANNOVAR new version is available ... Done
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_dbnsfp31a_interpro.txt.gz ... OK
+NOTICE: Downloading annotation database http://www.openbioinformatics.org/annovar/download/hg19_dbnsfp31a_interpro.txt.idx.gz ... OK
+NOTICE: Uncompressing downloaded files
+
+
+
+# The following command used to generate VCF file through ANNOVAR software (including all information about indels, transitions, transversions for 1 sample):
+
+(base) ubuntu@mai:~/annovar$ ./convert2annovar.pl -format vcf4 ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.vcf.gz > ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput
+NOTICE: Finished reading 17394 lines from VCF file
+NOTICE: A total of 17336 locus in VCF file passed QC threshold, representing 16240 SNPs (12027 transitions and 4213 transversions) and 1123 indels/substitutions
+NOTICE: Finished writing 16240 SNP genotypes (12027 transitions and 4213 transversions) and 1123 indels/substitutions for 1 sample
+
+
+
+# To run the ANNOVAR table function, we generate the following command and the results and output in csv format: 
+
+(base) ubuntu@mai:~/annovar$ ./table_annovar.pl ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput humandb/ -buildver hg19 -out ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22 -remove -protocol refGene,ensGene,clinvar_20180603,exac03,dbnsfp31a_interpro -operation g,g,f,f,f -otherinfo -nastring . -csvout
+NOTICE: the --polish argument is set ON automatically (use --nopolish to change this behavior)
+-----------------------------------------------------------------
+NOTICE: Processing operation=g protocol=refGene
+
+NOTICE: Running with system command <annotate_variation.pl -geneanno -buildver hg19 -dbtype refGene -outfile /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.refGene -exonsort -nofirstcodondel /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput humandb/>
+NOTICE: Output files are written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.refGene.variant_function, /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.refGene.exonic_variant_function
+NOTICE: Reading gene annotation from humandb/hg19_refGene.txt ... Done with 72212 transcripts (including 17527 without coding sequence annotation) for 28250 unique genes
+NOTICE: Processing next batch with 17363 unique variants in 17363 input lines
+NOTICE: Reading FASTA sequences from humandb/hg19_refGeneMrna.fa ... Done with 17198 sequences
+WARNING: A total of 446 sequences will be ignored due to lack of correct ORF annotation
+
+NOTICE: Running with system command <coding_change.pl  /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.refGene.exonic_variant_function.orig humandb//hg19_refGene.txt humandb//hg19_refGeneMrna.fa -alltranscript -out /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.refGene.fa -newevf /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.refGene.exonic_variant_function>
+-----------------------------------------------------------------
+NOTICE: Processing operation=g protocol=ensGene
+
+NOTICE: Running with system command <annotate_variation.pl -geneanno -buildver hg19 -dbtype ensGene -outfile /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.ensGene -exonsort -nofirstcodondel /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput humandb/>
+NOTICE: Output files are written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.ensGene.variant_function, /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.ensGene.exonic_variant_function
+NOTICE: Reading gene annotation from humandb/hg19_ensGene.txt ... Done with 196501 transcripts (including 101155 without coding sequence annotation) for 57905 unique genes
+NOTICE: Processing next batch with 17363 unique variants in 17363 input lines
+NOTICE: Reading FASTA sequences from humandb/hg19_ensGeneMrna.fa ... Done with 21669 sequences
+WARNING: A total of 6780 sequences will be ignored due to lack of correct ORF annotation
+
+NOTICE: Running with system command <coding_change.pl  /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.ensGene.exonic_variant_function.orig humandb//hg19_ensGene.txt humandb//hg19_ensGeneMrna.fa -alltranscript -out /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.ensGene.fa -newevf /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.ensGene.exonic_variant_function>
+-----------------------------------------------------------------
+NOTICE: Processing operation=f protocol=clinvar_20180603
+NOTICE: Finished reading 5 column headers for '-dbtype clinvar_20180603'
+
+NOTICE: Running system command <annotate_variation.pl -filter -dbtype clinvar_20180603 -buildver hg19 -outfile /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22 /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput humandb/ -otherinfo>
+NOTICE: the --dbtype clinvar_20180603 is assumed to be in generic ANNOVAR database format
+NOTICE: Output file with variants matching filtering criteria is written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.hg19_clinvar_20180603_dropped, and output file with other variants is written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.hg19_clinvar_20180603_filtered
+NOTICE: Processing next batch with 17363 unique variants in 17363 input lines
+NOTICE: Database index loaded. Total number of bins is 44107 and the number of bins to be scanned is 2949
+NOTICE: Scanning filter database humandb/hg19_clinvar_20180603.txt...Done
+-----------------------------------------------------------------
+NOTICE: Processing operation=f protocol=exac03
+NOTICE: Finished reading 8 column headers for '-dbtype exac03'
+
+NOTICE: Running system command <annotate_variation.pl -filter -dbtype exac03 -buildver hg19 -outfile /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22 /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput humandb/ -otherinfo>
+NOTICE: Output file with variants matching filtering criteria is written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.hg19_exac03_dropped, and output file with other variants is written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.hg19_exac03_filtered
+NOTICE: Processing next batch with 17363 unique variants in 17363 input lines
+NOTICE: Database index loaded. Total number of bins is 749886 and the number of bins to be scanned is 13156
+NOTICE: Scanning filter database humandb/hg19_exac03.txt...Done
+-----------------------------------------------------------------
+NOTICE: Processing operation=f protocol=dbnsfp31a_interpro
+NOTICE: Finished reading 1 column headers for '-dbtype dbnsfp31a_interpro'
+
+NOTICE: Running system command <annotate_variation.pl -filter -dbtype dbnsfp31a_interpro -buildver hg19 -outfile /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22 /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput humandb/ -otherinfo>
+NOTICE: Output file with variants matching filtering criteria is written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.hg19_dbnsfp31a_interpro_dropped, and output file with other variants is written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.hg19_dbnsfp31a_interpro_filtered
+NOTICE: Processing next batch with 17363 unique variants in 17363 input lines
+NOTICE: Database index loaded. Total number of bins is 275326 and the number of bins to be scanned is 6137
+NOTICE: Scanning filter database humandb/hg19_dbnsfp31a_interpro.txt...Done
+-----------------------------------------------------------------
+NOTICE: Multianno output file is written to /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered_chr22.hg19_multianno.csv
+
+
+
+# To Download snpEFF software to annotate the variants data, we have to use this command and make directory first (https://pcingola.github.io/SnpEff/se_running/):
+
+(base) ubuntu@mai:~$ mkdir snpEFF
+(base) ubuntu@mai:~$ cd snpEFF
+(base) ubuntu@mai:~/snpEFF$ wget https://snpeff.blob.core.windows.net/versions/snpEff_latest_core.zip
+--2021-04-12 22:27:44--  https://snpeff.blob.core.windows.net/versions/snpEff_latest_core.zip
+Resolving snpeff.blob.core.windows.net (snpeff.blob.core.windows.net)... 52.239.234.228
+Connecting to snpeff.blob.core.windows.net (snpeff.blob.core.windows.net)|52.239.234.228|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 45828841 (44M) [application/zip]
+Saving to: ‘snpEff_latest_core.zip’
+
+snpEff_latest_core.zip        100%[=================================================>]  43.71M  6.46MB/s    in 8.0s
+
+2021-04-12 22:27:53 (5.47 MB/s) - ‘snpEff_latest_core.zip’ saved [45828841/45828841]
+
+# To unzip the latest version of snpEFF_latest_core.zip, we run the command below:
+
+(base) ubuntu@mai:~/snpEFF$ unzip snpEff_latest_core.zip
+Archive:  snpEff_latest_core.zip
+   creating: snpEff/
+  inflating: snpEff/LICENSE.md
+  inflating: snpEff/snpEff.jar
+  inflating: snpEff/SnpSift.jar
+   creating: snpEff/galaxy/
+  inflating: snpEff/galaxy/snpSift_int.xml
+   creating: snpEff/galaxy/tool-data/
+  inflating: snpEff/galaxy/tool-data/snpEff_genomes.loc
+  inflating: snpEff/galaxy/tool-data/snpEff_genomes.loc.sample
+  inflating: snpEff/galaxy/snpEffWrapper.pl
+  inflating: snpEff/galaxy/snpEff.xml
+  inflating: snpEff/galaxy/tool_conf.xml
+  inflating: snpEff/galaxy/snpSift_caseControl.xml
+  inflating: snpEff/galaxy/snpSift_filter.xml
+  inflating: snpEff/galaxy/snpSift_annotate.xml
+  inflating: snpEff/galaxy/snpSiftWrapper.pl
+  inflating: snpEff/galaxy/tool_dependencies.xml
+  inflating: snpEff/galaxy/snpEff_download.xml
+  inflating: snpEff/snpEff.config
+   creating: snpEff/examples/
+  inflating: snpEff/examples/samples_cancer.txt
+  inflating: snpEff/examples/example_motif.vcf
+  inflating: snpEff/examples/cancer.eff.vcf
+  inflating: snpEff/examples/examples.sh
+  inflating: snpEff/examples/test.chr22.ann.txt
+  inflating: snpEff/examples/test.1KG.vcf
+  inflating: snpEff/examples/cancer.ann.vcf
+  inflating: snpEff/examples/1kg.head_chr1.filtered.vcf.gz
+ extracting: snpEff/examples/test.vcf
+  inflating: snpEff/examples/test.chr22.ann.filter_missense_first.vcf
+  inflating: snpEff/examples/test.1KG.ann_reg.vcf
+  inflating: snpEff/examples/cancer.vcf
+  inflating: snpEff/examples/my_annotations.bed
+  inflating: snpEff/examples/test.chr22.ann.filter_missense_any_TRMT2A.vcf
+  inflating: snpEff/examples/cancer_pedigree.ann.vcf
+  inflating: snpEff/examples/variants_2.vcf
+  inflating: snpEff/examples/test.ann.vcf
+  inflating: snpEff/examples/intervals.bed
+  inflating: snpEff/examples/test.1KG.ann_encode.vcf
+  inflating: snpEff/examples/variants_1.vcf
+  inflating: snpEff/examples/test.chr22.ann.vcf
+  inflating: snpEff/examples/file.vcf
+  inflating: snpEff/examples/variants_1.ann.vcf
+  inflating: snpEff/examples/test.chr22.vcf
+  inflating: snpEff/examples/1kg.head_chr1.vcf.gz
+  inflating: snpEff/examples/samples_cancer_one.txt
+  inflating: snpEff/examples/test.chr22.ann.filter_missense_any.vcf
+  inflating: snpEff/examples/test.chr22.ann.one_per_line.txt
+  inflating: snpEff/examples/variants_2.ann.vcf
+  inflating: snpEff/examples/cancer_pedigree.vcf
+  inflating: snpEff/examples/test.chr22.ann.filter_missense.vcf
+   creating: snpEff/scripts/
+  inflating: snpEff/scripts/vcfBareBones.pl
+  inflating: snpEff/scripts/cgShore.pl
+  inflating: snpEff/scripts/vcfInfoOnePerLine.pl
+  inflating: snpEff/scripts/sam2fastq.pl
+  inflating: snpEff/scripts/queue.pl
+  inflating: snpEff/scripts/extractSequences.pl
+  inflating: snpEff/scripts/isutf8.py
+  inflating: snpEff/scripts/db.pl
+  inflating: snpEff/scripts/annotate_demo.sh
+  inflating: snpEff/scripts/filterBy.py
+  inflating: snpEff/scripts/countColumns.py
+   creating: snpEff/scripts/gsa/
+  inflating: snpEff/scripts/gsa/bayesFactor_correction_scoreCount_max10.sh
+  inflating: snpEff/scripts/gsa/geneSetOverlap.sort.txt
+  inflating: snpEff/scripts/gsa/create_sets.bds
+  inflating: snpEff/scripts/gsa/bayesFactor_correction_scoreCount.r
+  inflating: snpEff/scripts/gsa/geneSetsGtex.py
+  inflating: snpEff/scripts/gsa/pvalue_correction_scoreCount.sh
+  inflating: snpEff/scripts/gsa/pvalue_correction_scoreCount.r
+  inflating: snpEff/scripts/gsa/checkGeneNames.py
+  inflating: snpEff/scripts/gsa/geneSetOverlap.py
+  inflating: snpEff/scripts/gsa/pvalue_correction_scoreCount_min10.sh
+  inflating: snpEff/scripts/gsa/bayesFactor_correction_scoreCount.sh
+  inflating: snpEff/scripts/plotSmoothScatter.pl
+  inflating: snpEff/scripts/plot.pl
+  inflating: snpEff/scripts/ped2vcf.py
+  inflating: snpEff/scripts/uniqCut.pl
+  inflating: snpEff/scripts/vcfEffOnePerLine.pl
+  inflating: snpEff/scripts/joinSnpEff.pl
+  inflating: snpEff/scripts/vcfEffHighest.ORI.py
+  inflating: snpEff/scripts/fastqSplit.pl
+  inflating: snpEff/scripts/splitChr.pl
+  inflating: snpEff/scripts/make_dbNSFP.sh
+  inflating: snpEff/scripts/make_and_commit_docs.sh
+  inflating: snpEff/scripts/join.pl
+  inflating: snpEff/scripts/txt2fa.pl
+  inflating: snpEff/scripts/nextProt_filter.pl
+  inflating: snpEff/scripts/snpEff
+  inflating: snpEff/scripts/vcfOnlyAlts.pl
+  inflating: snpEff/scripts/annotate_demo_GATK.sh
+  inflating: snpEff/scripts/fastaSplit.pl
+  inflating: snpEff/scripts/snpSift
+  inflating: snpEff/scripts/transpose.pl
+  inflating: snpEff/scripts/sortLine.py
+  inflating: snpEff/scripts/vcfAnnFirst.py
+  inflating: snpEff/scripts/cgShore.sh
+  inflating: snpEff/scripts/fasta2tab.pl
+  inflating: snpEff/scripts/txt2vcf.py
+  inflating: snpEff/scripts/snpSift_filter_sample_to_number.pl
+  inflating: snpEff/scripts/uniqCount.pl
+  inflating: snpEff/scripts/swapCols.pl
+  inflating: snpEff/scripts/fastaSample.pl
+  inflating: snpEff/scripts/plotQQ.pl
+  inflating: snpEff/scripts/bedEffOnePerLine.pl
+  inflating: snpEff/scripts/vcfRefCorrect.py
+  inflating: snpEff/scripts/plotQQsubsample.pl
+  inflating: snpEff/scripts/sample.pl
+  inflating: snpEff/scripts/buildDbNcbi.sh
+  inflating: snpEff/scripts/vcfFilterSamples.pl
+  inflating: snpEff/scripts/1kg.sh
+  inflating: snpEff/scripts/wigSplit.pl
+  inflating: snpEff/scripts/gffRemovePhase.pl
+  inflating: snpEff/scripts/plotLabel.pl
+  inflating: snpEff/scripts/vcfReduceGenotypes.pl
+  inflating: snpEff/scripts/plotMA.pl
+  inflating: snpEff/scripts/statsNum.pl
+  inflating: snpEff/scripts/plotHistogram.pl
+  inflating: snpEff/scripts/plotXY.pl
+   creating: snpEff/exec/
+  inflating: snpEff/exec/snpeff
+  inflating: snpEff/exec/snpsift
+
+
+
+# To generate the variants calling format file using snpEFF, we used this commands:
+
+(base) ubuntu@mai:~/snpEFF$ cd /home/ubuntu/ngs_course/dnaseq/results
+(base) ubuntu@mai:~/ngs_course/dnaseq/results$ unzip NGS0001_filtered_chr22.vcf.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq/results$ cd
+(base) ubuntu@mai:~$ cd snpEFF/
+(base) ubuntu@mai:~/snpEFF/snpEff$ sudo du -sh
+sudo: unable to resolve host mai
+131M    .
+(base) ubuntu@mai:~/snpEFF/snpEff$ java -Xmx8g -jar snpEff.jar hg19 /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filte
+red.vcf > /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered.ann.vcf
+(base) ubuntu@mai:~/snpEFF/snpEff$ java -Xmx8g -jar snpEff.jar hg19 ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.vcf.gz > /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered.ann.vcf
+(base) ubuntu@mai:~/snpEFF/snpEff$
+

@@ -1,0 +1,94 @@
+Variant_Calling_and_Filtering:
+
+# This section for variants calling using freebayes software.
+#FreeBayes is a Bayesian genetic variant detector designed to find small polymorphisms, specifically SNPs (single-nucleotide polymorphisms), indels (insertions and deletions), MNPs (multi-nucleotide polymorphisms), and complex events (composite insertion and substitution events) smaller than the length of a short-read sequencing alignment.
+# This process requires two inputs: a FASTA reference sequence, and a bam-format alignment file by reference position.
+# The output reports positions which it finds polymorphic in variant calling file (VCF) format. 
+# To convert to text format the reference (as required by samtools faidx) and index it with samtools faidx, we have to use the following commands:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ zcat ~/ngs_course/dnaseq/data/reference/hg19.fa.gz > ~/ngs_course/dnaseq/data/reference/hg19.fa
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools faidx ~/ngs_course/dnaseq/data/reference/hg19.fa
+
+# The following commands used for calling variants with Freebayes tools and then compress the output (the results are variants in vcf file):
+((base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ freebayes --bam ~/ngs_course/dnaseq/data/aligned_data/NGS0001_sorted_filtered.bam --fasta-reference ~/ngs_course/dnaseq/data/reference/hg19.fa --vcf ~/ngs_course/dnaseq/results/NGS0001.vcf
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ bgzip ~/ngs_course/dnaseq/results/NGS0001.vcf
+[bgzip] /home/ubuntu/ngs_course/dnaseq/results/NGS0001.vcf.gz already exists; do you wish to overwrite (y or n)? y
+
+# To index the vcf data, we have to use the tabix command as below:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ tabix -p vcf ~/ngs_course/dnaseq/results/NGS0001.vcf.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ conda install vcflib
+Collecting package metadata (current_repodata.json): done
+Solving environment: done
+
+## Package Plan ##
+
+  environment location: /home/ubuntu/anaconda3
+
+  added / updated specs:
+    - vcflib
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    conda-4.10.0               |   py37h06a4308_0         2.9 MB
+    ------------------------------------------------------------
+                                           Total:         2.9 MB
+
+The following packages will be UPDATED:
+
+  conda                                4.9.2-py37h06a4308_0 --> 4.10.0-py37h06a4308_0
+
+
+Proceed ([y]/n)? y
+
+
+Downloading and Extracting Packages
+conda-4.10.0         | 2.9 MB    | ###################################################################################### | 100%
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+# This section for filtering the vcf data:
+# We run Freebayes with default parameters, the resulting vcf contains a number of "bad" calls and we have to filter it to provide high quality data.
+# This is to explain how the vcf quality performed: "QUAL=probability that there is a polymorphism at the loci described by the record: 1 - P(locus is homozygous given the data). AO=Alternate allele observations, SAF=Number of alternate observations on the forward strand, SAR=Number of alternate observations on the reverse strand, RPL=Reads Placed Left: number of reads supporting the alternate balanced to the left (5’) of the alternate allele, RPR=Reads Placed Right: number of reads supporting the alternate balanced to the right (3’) of the alternate allele"
+# This can be performed via this command: $ vcffilter -f "QUAL > 1 & QUAL / AO > 10 & SAF > 0 & SAR > 0 & RPR > 1 & RPL > 1". That means: "QUAL > 1: removes horrible sites QUAL / AO > 10 : additional contribution of each obs should be 10 log units (~ Q10 per read) SAF > 0 & SAR > 0 : reads on both strands RPR > 1 & RPL > 1 : at least two reads “balanced” to each side of the site". 
+# The command for filtering variants is here:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ vcffilter -f "QUAL > 1 & QUAL / AO > 10 & SAF > 0 & SAR > 0 & RPR > 1 & RPL > 1" ~/ngs_course/dnaseq/results/NGS0001.vcf.gz > ~/ngs_course/dnaseq/results/NGS0001_filtered.vcf
+
+
+# The bed file chr22.genes.b37.bed describes the exome sequences and genes that targeted.
+# Using bedtools we can filter the vcf file for the regions in chr22.genes.b37.bed. The output file is compressed by bgzip command and then indexed using tabix command as below: 
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ bedtools intersect -header -wa -a ~/ngs_course/dnaseq/results/NGS0001_filtered.vcf -b ../annotation.bed > ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.vcf
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ bgzip ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.vcf
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ tabix -p vcf ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.vcf.gz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

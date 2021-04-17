@@ -1,0 +1,334 @@
+
+
+# This section is for Bash Pipeline using Bash Script:
+
+# We have to create a directory tree for this project as shown below.
+# change directory to ngs_course directory to make a nother directory within it called dnaseq_pipeline. This will generate NEW PROJECT DIRECTORY TREE. The commands to follow are:
+
+(base) ubuntu@mai:~/annovar$ cd ~/ngs_course
+(base) ubuntu@mai:~/ngs_course$ mkdir dnaseq_pipeline
+
+
+# We have to change directory to dnaseq_pipeline and then create new directories within dnaseq_pipeline to keep files organised:
+(base) ubuntu@mai:~/ngs_course$ cd ~/ngs_course/dnaseq_pipeline
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline$ mkdir data meta results logs scripts
+
+
+# Using the command $ls to list all the contents in this directory: 
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline$ ls
+data  logs  meta  results  scripts
+
+
+# The command below is used to give us more details of the contents in these directories including date size as well as verifying our new created directories:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline$ ls -lF
+total 20
+drwxrwxr-x 2 ubuntu ubuntu 4096 Apr 10 01:51 data/
+drwxrwxr-x 2 ubuntu ubuntu 4096 Apr 10 01:51 logs/
+drwxrwxr-x 2 ubuntu ubuntu 4096 Apr 10 01:51 meta/
+drwxrwxr-x 2 ubuntu ubuntu 4096 Apr 10 01:51 results/
+drwxrwxr-x 2 ubuntu ubuntu 4096 Apr 10 01:51 scripts/
+
+
+# First have to change directory to subdirectory data to store all our data in it.
+# Then, make directory for trimmed_fastq and untrimmed_fastq subdirectories.
+# For trimming data, we have to run the following commands 
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline$ cd ~/ngs_course/dnaseq_pipeline/data
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ mkdir trimmed_fastq
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ mkdir untrimmed_fastq
+
+
+# We have to copy fastq data from the dnaseq project first (These include the sequencing data, the bed file and the reference genome)
+# Because of the limitted space in the server, we have to use the command $ mv instead of $ cp. This will help us to process the work smoothly. I followed the steps below:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ mv ~/ngs_course/dnaseq/data/untrimmed_fastq/NGS0001.R1.fastq.gz ~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ mv ~/ngs_course/dnaseq/data/untrimmed_fastq/NGS0001.R2.fastq.gz ~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ mv ~/ngs_course/dnaseq/data/annotation.bed ~/ngs_course/dnaseq_pipeline/data/
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ mkdir ~/ngs_course/dnaseq_pipeline/data/reference
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ mv ~/ngs_course/dnaseq/data/reference/hg19.fa.gz ~/ngs_course/dnaseq_pipeline/data/reference/
+
+
+# The following commands used in Bash Script called test.sh
+# The following steps for creating Bash Script:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ for dirname in $(ls ~/ngs_course/dnaseq/)
+> do
+>   echo The following is the content of $dirname :
+>   ls ~/ngs_course/dnaseq/$dirname
+>   echo                                            
+> done
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data$ cd ~/ngs_course/dnaseq_pipeline/scripts
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ nano test.sh
+
+
+# We have to change to insert mode and type in the following lines in test.sh file. Then, save and exit:
+
+#!/bin/bash #
+
+for dirname in $(ls ~/ngs_course/dnaseq/)
+do
+echo The following is the content of $dirname
+ls ~/ngs_course/dnaseq/$dirname
+echo
+done
+
+
+# Now, we are ready to run the shell script we created using bash test.sh command:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ bash test.sh
+# The above commands generated all the files in dnaseq_pipeline directory
+# The following is the content of data
+aligned_data  annotation.bed_cut  annotation_plus5.bed  other  RABL2B_exons  reference  trimmed_fastq  untrimmed_fastq
+
+# The following is the content of listing.sh
+/home/ubuntu/ngs_course/dnaseq/listing.sh
+
+# The following is the content of logs
+fastqc_summaries.txt
+
+# The following is the content of meta
+
+# The following is the content of other
+*bad*                    *.fastq.gz-bad-reads.fastq           NGS0001.R1.fastq.qz-bad-reads.fastq     NGS0001.R2.fastq.qz-bad-reads.fastq
+bad-reads.count.summary  generate_bad_reads_summary.sh        NGS0001.R1.fastq.qz-bad-reads.fastq.qz  NGS0001.R2.fastq.qz-bad-reads.fastq.qz
+bad_reads.txt            NGS0001.R1.fastq.gz-bad-reads.fastq  NGS0001.R2.fastq.gz-bad-reads.fastq
+
+# The following is the content of README.txt
+
+# The following is the content of results
+fastqc_untrimmed_reads                     NGS0001_filtered_chr22.vcf.gz      NGS0001_filtered.vcf.gz      NGS0001.vcf.gz.tbi
+NGS0001_filtered_chr22.avinput             NGS0001_filtered_chr22.vcf.gz.tbi  NGS0001_filtered.vcf.gz.tbi
+NGS0001_filtered_chr22.hg19_multianno.csv  NGS0001_filtered.vcf               NGS0001.vcf.gz
+
+
+# The following commands are used for Bash variables and storing single or more values. These variables can be used to count the number of lines or the number of words in a file.
+# $ echo command is used here just to check if we created the varibale
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ num=25
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ echo num
+num
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ echo $num
+25
+
+
+# In this step, we defined variables such as: file=NGS0001.R1.fastq.gz   and   file2=NGS0001.R2.fastq.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ file=NGS0001.R1.fastq.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ file2=NGS0001.R2.fastq.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ echo $file
+NGS0001.R1.fastq.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ echo $file2
+NGS0001.R2.fastq.gz
+
+
+# We need to change into untrimmed_fastq directory and check the number of lines within these files:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ cd ~/ngs_course/dnaseq/data/untrimmed_fastq
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq$ wc -l $file
+3140439 NGS0001.R1.fastq.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq$ wc -l $file2
+3133335 NGS0001.R2.fastq.gz
+
+
+# The following command is used to list all the filenames in the directory that have a fastq.gz extension
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq$ ls *.fastq.gz
+NGS0001.R1.fastq.gz  NGS0001.R2.fastq.gz
+
+
+# We used the variable called filenames and we used echo command to see what is stored inside our newly created variable
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq$ filenames=`ls *.fastq.gz`
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq$ echo $filenames
+NGS0001.R1.fastq.gz NGS0001.R2.fastq.gz
+
+
+# Here, we repeated the above step again using wc -l command with our new variable filenames as the argument:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq$ wc -l $filenames
+   3140439 NGS0001.R1.fastq.gz
+   3133335 NGS0001.R2.fastq.gz
+   6273774 total
+
+
+# To use special variable types in Bash Script, the arguments passed to the script from the command line:
+# More special numeric variables (positional parameters)
+# $0 is the name of the script itself, $1 is the first argument, $2 the second, $3 the third, and so forth. [2] After $9, the arguments must be enclosed in brackets, for example, ${10}, ${11}, ${12}. 
+# The following must be written in the script, follow the steps below, and run the script:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq$ cd ~/ngs_course/dnaseq_pipeline/scripts
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ nano test_1.sh
+
+
+# we have to write in the shell:
+#!/bin/bash
+
+echo the name of the script is $0
+echo 
+echo the first argument was $1 and the second $2
+
+(save and exit)
+
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ bash test_1.sh something "something else"
+the name of the script is test_1.sh
+the first argument was something and the second something else
+
+
+# The following steps on how the Bash Script run trimmomatic on paired end sequencing data and create the file pipeline:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ nano pipeline.sh
+
+
+# We have to type this in the shell:
+#!/bin/bash
+
+trimmomatic PE  \
+  -threads 4 \
+  -phred33 \
+  $1 $2 \
+  -baseout ~/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data \
+  ILLUMINACLIP:/home/ubuntu/anaconda3/pkgs/trimmomatic-0.39-hdfd78af_2/share/trimmomatic-0.39-2/adapters/NexteraPE-PE.fa:2:30:10 
+  TRAILING:25 MINLEN:50
+ 
+(save and exit)
+
+
+# To run the script, we use the following command:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ bash pipeline.sh ~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq/NGS0001.R1.fastq.gz ~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq/NGS0001.R2.fastq.gz
+TrimmomaticPE: Started with arguments:
+ -threads 4 -phred33 /home/ubuntu/ngs_course/dnaseq_pipeline/data/untrimmed_fastq/NGS0001.R1.fastq.gz /home/ubuntu/ngs_course/dnaseq_pipeline/data/untrimmed_fastq/NGS0001.R2.fastq.gz -baseout /home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data ILLUMINACLIP:/home/ubuntu/anaconda3/pkgs/trimmomatic-0.39-hdfd78af_2/share/trimmomatic-0.39-2/adapters/NexteraPE-PE.fa:2:30:10 TRAILING:25 MINLEN:50
+Using templated Output files: /home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data_1P /home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data_1U /home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data_2P /home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data_2U
+Using PrefixPair: 'AGATGTGTATAAGAGACAG' and 'AGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG'
+Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
+Using Long Clipping Sequence: 'CTGTCTCTTATACACATCTGACGCTGCCGACGA'
+ILLUMINACLIP: Using 1 prefix pairs, 4 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Input Read Pairs: 9007781 Both Surviving: 8689630 (96.47%) Forward Only Surviving: 247686 (2.75%) Reverse Only Surviving: 51933 (0.58%) Dropped: 18532 (0.21%)
+TrimmomaticPE: Completed successfully
+
+
+# Now, we can change directory to trimmed_fastq directory and list its contents:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$ cd /home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/trimmed_fastq$ ls
+pipeline.sh  trimmed_data_1P  trimmed_data_1U  trimmed_data_2P  trimmed_data_2U
+
+
+# After trimming, we have to add fastqc data to the Bash Script. This will generate pipeline.sh script.
+# We can run fastQC data on the generated trimmed data and this script generates fastQC reports. 
+# The following commands are used to generate the FastQC reports in the "fastqc_trimmed_reads.
+# First, to make the script run FastQC on the generated trimmed data, we have to open the pipeline.sh with nano and add the following command line:
+fastqc -t 4 /home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data_1P \
+	/home/ubuntu/ngs_course/dnaseq_pipeline/data/trimmed_fastq/trimmed_data_2P
+	
+mkdir ~/ngs_course/dnaseq_pipeline/results/fastqc_trimmed_reads
+
+mv ~/ngs_course/dnaseq_pipeline/data/trimmed_fastq/*fastqc* ~/ngs_course/dnaseq_pipeline/results/fastqc_trimmed_reads/
+
+
+# The following commands are used to run pipeline.sh and see if it generates the FastQC reports in the "fastqc_trimmed_reads
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/trimmed_fastq$ bash pipeline.sh ~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq/NGS0001.R1.fastq.gz ~/ngs_course/dnaseq_pipeline/data/untrimmed_fastq/NGS0001.R2.fastq.gz
+Started analysis of trimmed_data_1P
+Started analysis of trimmed_data_2P
+Approx 5% complete for trimmed_data_1P
+Approx 5% complete for trimmed_data_2P
+Approx 10% complete for trimmed_data_1P
+Approx 10% complete for trimmed_data_2P
+Approx 15% complete for trimmed_data_1P
+Approx 15% complete for trimmed_data_2P
+Approx 20% complete for trimmed_data_1P
+Approx 20% complete for trimmed_data_2P
+Approx 25% complete for trimmed_data_1P
+Approx 25% complete for trimmed_data_2P
+Approx 30% complete for trimmed_data_1P
+Approx 30% complete for trimmed_data_2P
+Approx 35% complete for trimmed_data_1P
+Approx 35% complete for trimmed_data_2P
+Approx 40% complete for trimmed_data_1P
+Approx 40% complete for trimmed_data_2P
+Approx 45% complete for trimmed_data_1P
+Approx 45% complete for trimmed_data_2P
+Approx 50% complete for trimmed_data_1P
+Approx 50% complete for trimmed_data_2P
+Approx 55% complete for trimmed_data_1P
+Approx 55% complete for trimmed_data_2P
+Approx 60% complete for trimmed_data_1P
+Approx 60% complete for trimmed_data_2P
+Approx 65% complete for trimmed_data_1P
+Approx 65% complete for trimmed_data_2P
+Approx 70% complete for trimmed_data_1P
+Approx 70% complete for trimmed_data_2P
+Approx 75% complete for trimmed_data_1P
+Approx 75% complete for trimmed_data_2P
+Approx 80% complete for trimmed_data_1P
+Approx 80% complete for trimmed_data_2P
+Approx 85% complete for trimmed_data_1P
+Approx 85% complete for trimmed_data_2P
+Approx 90% complete for trimmed_data_1P
+Approx 90% complete for trimmed_data_2P
+Approx 95% complete for trimmed_data_1P
+Approx 95% complete for trimmed_data_2P
+Analysis complete for trimmed_data_1P
+Analysis complete for trimmed_data_2P
+
+
+# Now, we can run pipeline.sh and see if it generates the FastQC reports in the "fastqc_trimmed_reads" directory:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/data/trimmed_fastq$ cd ~/ngs_course/dnaseq_pipeline/results/fastqc_trimmed_reads/
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/results/fastqc_trimmed_reads$ ls
+trimmed_data_1P_fastqc.html  trimmed_data_1P_fastqc.zip  trimmed_data_2P_fastqc.html  trimmed_data_2P_fastqc.zip
+
+
+# The next steps:
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/results/alignment$ cd ~/ngs_course/dnaseq_pipeline/scripts
+(base) ubuntu@mai:~/ngs_course/dnaseq_pipeline/scripts$  nano pipeline.sh
+
+# In these steps, we open the shel and type commands start with:
+ #!/bin/bash
+
+For examples:
+
+#!/bin/bash
+
+./table_annovar.pl ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.avinput humandb/ -buildver hg19 -out ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22 -remove -protocol refGene,ensGene,clinvar_20180603,exac03,dbnsfp31a_interpro -operation g,g,f,f,f -otherinfo -nastring . -csvout
+
+
+
+#!/bin/bash
+
+java -Xmx8g -jar snpEff.jar hg19 ~/ngs_course/dnaseq/results/NGS0001_filtered_chr22.vcf.gz > /home/ubuntu/ngs_course/dnaseq/results/NGS0001_filtered.ann.vcf
+
+
+
+#!/bin/bash
+
+freebayes --bam ~/ngs_course/dnaseq/data/aligned_data/NGS0001_sorted_filtered.bam --fasta-reference ~/ngs_course/dnaseq/data/reference/hg19.fa --vcf ~/ngs_course/dnaseq/results/NGS0001.vcf
+
+
+
+#!/bin/bash
+
+vcffilter -f "QUAL > 1 & QUAL / AO > 10 & SAF > 0 & SAR > 0 & RPR > 1 & RPL > 1" ~/ngs_course/dnaseq/results/NGS0001.vcf.gz > ~/ngs_course/dnaseq/results/NGS0001_filtered.vcf
+
+
+
+#!/bin/bash
+
+samtools view -F 1796  -q 20 -o NGS0001_sorted_filtered.bam NGS0001_sort
+ed_marked.bam
+
+samtools index NGS0001_sorted_filtered.bam
+
+
+
+#!/bin/bash
+
+bwa index ~/ngs_course/dnaseq/data/reference/hg19.fa.gz
+
+
+
+#!/bin/bash
+
+bwa mem -t 4 -v 1 -R '@RG\tID:11V6WR1.111.HD1375ACXX.1.NGS0001\tSM:NGS0001\tPL:ILLUMINA\tLB:nextera\tDT:2017-02-28\tPU:11V6WR1' -I 250,50  ~/ngs_course/dnaseq/data/reference/hg19.fa.gz ~/ngs_course/dnaseq/data/trimmed_fastq/NGS0001_trimmed_R_1P ~/ngs_course/dnaseq/data/trimmed_fastq/NGS0001_trimmed_R_2P > ~/ngs_course/dnaseq/data/aligned_data/NGS0001.sam
+
+
+
+
+# We applied this for the remaining of data to generate files:
+Trimming
+fastQC
+Alignement
+Duplicate marking
+Post-alignemtn filtering
+Variant Calling
+Variant filtering
+Variant annotation
+
+

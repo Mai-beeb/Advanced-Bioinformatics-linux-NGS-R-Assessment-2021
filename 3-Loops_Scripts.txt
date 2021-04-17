@@ -1,0 +1,135 @@
+
+# This section is for shell and to how to deal with multiple files
+# It also about how to use commands into a script and to re-run later 
+# It is about how to generate automated workflow with script
+
+#  We can change directory into the dnaseq directory and open a new file using nano listing.sh
+(base) ubuntu@mai:~$ cd ~/ngs_course/dnaseq
+(base) ubuntu@mai:~/ngs_course/dnaseq$ nano listing.sh
+
+# We typed in the following lines in the listing.sh file:
+  echo "Your current working directory is:"
+  pwd
+  echo "These are the contents of this directory:"
+  ls -l 
+
+# To run the new shell script we have created, we have to use bash or sh command:
+(base) ubuntu@mai:~/ngs_course/dnaseq$ sh listing.sh
+Your current working directory is:
+/home/ubuntu/ngs_course/dnaseq
+These are the contents of this directory:
+total 28
+drwxrwxr-x 5 ubuntu ubuntu 4096 Mar 30 18:15 data
+-rw-rw-r-- 1 ubuntu ubuntu  102 Mar 31 01:07 listing.sh
+drwxrwxr-x 2 ubuntu ubuntu 4096 Mar 30 01:44 logs
+drwxrwxr-x 2 ubuntu ubuntu 4096 Mar 27 19:49 meta
+drwxrwxr-x 2 ubuntu ubuntu 4096 Mar 28 17:24 other
+drwxrwxr-x 2 ubuntu ubuntu 4096 Mar 30 12:42 README.txt
+drwxrwxr-x 3 ubuntu ubuntu 4096 Mar 29 04:50 results
+
+
+# Here, we are using bash variables:
+# To know that we created the bash variable, we use the echo command to print to terminal:
+(base) ubuntu@mai:~/ngs_course/dnaseq$ num=25
+(base) ubuntu@mai:~/ngs_course/dnaseq$ echo num
+num
+(base) ubuntu@mai:~/ngs_course/dnaseq$ echo $num
+25
+
+# Here, we define a variable named file (the file name is NGS0001.R1.fastq.gz)
+(base) ubuntu@mai:~/ngs_course/dnaseq$ file=NGS0001.R1.fastq.gz
+
+# Here, we used echo command to see what inside file
+(base) ubuntu@mai:~/ngs_course/dnaseq$ echo $file
+NGS0001.R1.fastq.gz
+
+# Change directory into raw_fastq (untrimmed_fastq) directory 
+# We can count the number of lines in file named NGS0001.R1.fastq.gz
+(base) ubuntu@mai:~/ngs_course/dnaseq$ cd ~/ngs_course/dnaseq/data/untrimmed_fastq
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ wc -l $file
+3140439 NGS0001.R1.fastq.gz
+
+# The following command is used to list all the filenames in the directory that have a fastq.gz extension
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ ls *.fastq.gz
+NGS0001.R1.fastq.gz  NGS0001.R2.fastq.gz
+
+# We used echo chommand to see what stored inside the new variable named filenames
+# The command below shows us that we can run a single command on multiple files by creating a variable whose values are the filenames that we wish to work on.
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ filenames=`ls *.fastq.gz` 
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ echo $filenames
+NGS0001.R1.fastq.gz NGS0001.R2.fastq.gz
+
+# We used wc -l for the new variable named filenames as the argument as shown below:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ wc -l $filenames
+   3140439 NGS0001.R1.fastq.gz
+   3133335 NGS0001.R2.fastq.gz
+   6273774 total
+
+# Loops is used to run a sequence of multiple commands, on multiple files
+# The structure or the syntax of (for) loops in bash is as follows:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ for filename in *.fastq.gz
+> do
+>   echo $filename
+>   wc -l $filename
+> done
+NGS0001.R1.fastq.gz
+3140439 NGS0001.R1.fastq.gz
+NGS0001.R2.fastq.gz
+3133335 NGS0001.R2.fastq.gz
+
+# We can run the same commands (echo and wc -l) used in the "Bash variables" section
+# The structure or the syntax of (for) loops in bash is as follows:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ for filename in *.fastq.gz
+> do
+>   echo $filename
+>   wc -l $filename
+> done
+
+
+# Here, we know how to use commands for automating with sccripts:
+# We used the following commands to create a script file with all relevant commands. 
+# Use nano to create our new script file.
+# We always want to start our scripts with a shebang line: #!/bin/bash
+# The shebang line ensures that the bash shell interprets the script even if it is executed using a different shell.
+# After the shebang line, we have to enter the commands we want to execute.
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ nano generate_bad_reads_summary.sh
+
+# We have to write the commands below the shebang in the script:
+#!/bin/bash 
+
+# enter directory with raw FASTQs
+cd ~/ngs_course/dnaseq/data/untrimmed_fastq
+
+# loop over all FASTQ files
+for filename in *.fastq.gz
+
+do 
+  echo $filename; 
+
+  # grab all the bad read records (we need to use zgrep as *.fastq.gz is compressed)
+  zgrep -B1 -A2 NNNNNNNNNN $filename > $filename-bad-reads.fastq;
+
+  # grab the number of bad reads and write it to a summary file
+  zgrep -cH NNNNNNNNNN $filename >> bad-reads.count.summary;
+done
+
+# We have to save it and exit.
+# Now we have a script that we can use it to assess the quality of all our new datasets.
+# To run the script, we have use the command below:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ sh generate_bad_reads_summary.sh
+NGS0001.R1.fastq.gz
+NGS0001.R2.fastq.gz
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ ls
+bad-reads.count.summary        NGS0001.R1.fastq.gz-bad-reads.fastq  NGS0001.R2.fastq.gz
+bad_reads.txt                  NGS0001.R1.fastq.qz.1                NGS0001.R2.fastq.gz-bad-reads.fastq
+generate_bad_reads_summary.sh  NGS0001.R1.fastq.qz_fastqc.html      NGS0001.R2.fastq.qz_fastqc.html
+NGS0001.R1.fastq               NGS0001.R1.fastq.qz_fastqc.zip       NGS0001.R2.fastq.qz_fastqc.zip
+NGS0001.R1.fastq.gz            NGS0001.R2.fastq
+
+# We have to create a directory called other
+# We have to move all of the bad read files and script out of our untrimmed_fastq directory into the other directory
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ mkdir ~/ngs_course/dnaseq/other
+mkdir: cannot create directory ‘/home/ubuntu/ngs_course/dnaseq/other’: File exists
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ mv ~/ngs_course/dnaseq/data/untrimmed_fastq/*bad* ~/ngs_course/dnaseq/other
+

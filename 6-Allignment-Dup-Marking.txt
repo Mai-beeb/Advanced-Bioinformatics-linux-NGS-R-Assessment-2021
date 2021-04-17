@@ -1,0 +1,523 @@
+Alignment with bwa and duplicate marking with picard tools:
+
+# For read alignment:
+# Fllowing trimming, the fllowing steps are used to align sequence reads to the reference genome using alignment method BWA.
+# Run the commands: $ bwa and $ bwa mem for read allignment
+# We need to index the genome with `bwa index' command.
+# bwa is a software package for mapping DNA sequences against a large reference genome, such as the human genome. It consists of three algorithms: BWA-backtrack, BWA-SW and BWA-MEM. The first algorithm is designed for Illumina sequence reads up to 100bp, while the rest two for longer sequences ranged from 70bp to a few megabases. BWA-MEM and BWA-SW share similar features such as the support of long reads and chimeric alignment, but BWA-MEM, which is the latest, is generally recommended as it is faster and more accurate. BWA-MEM also has better performance than BWA-backtrack for 70-100bp Illumina reads.
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ bwa
+
+Program: bwa (alignment via Burrows-Wheeler transformation)
+Version: 0.7.17-r1188
+Contact: Heng Li <lh3@sanger.ac.uk>
+
+Usage:   bwa <command> [options]
+
+Command: index         index sequences in the FASTA format
+         mem           BWA-MEM algorithm
+         fastmap       identify super-maximal exact matches
+         pemerge       merge overlapping paired ends (EXPERIMENTAL)
+         aln           gapped/ungapped alignment
+         samse         generate alignment (single ended)
+         sampe         generate alignment (paired ended)
+         bwasw         BWA-SW for long queries
+
+         shm           manage indices in shared memory
+         fa2pac        convert FASTA to PAC format
+         pac2bwt       generate BWT from PAC
+         pac2bwtgen    alternative algorithm for generating BWT
+         bwtupdate     update .bwt to the new format
+         bwt2sa        generate SA from BWT and Occ
+
+Note: To use BWA, you need to first index the genome with `bwa index'.
+      There are three alignment algorithms in BWA: `mem', `bwasw', and
+      `aln/samse/sampe'. If you are not sure which to use, try `bwa mem'
+      first. Please `man ./bwa.1' for the manual.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# For bwa mem algorithm:
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ bwa mem
+
+Usage: bwa mem [options] <idxbase> <in1.fq> [in2.fq]
+
+Algorithm options:
+
+       -t INT        number of threads [1]
+       -k INT        minimum seed length [19]
+       -w INT        band width for banded alignment [100]
+       -d INT        off-diagonal X-dropoff [100]
+       -r FLOAT      look for internal seeds inside a seed longer than {-k} * FLOAT [1.5]
+       -y INT        seed occurrence for the 3rd round seeding [20]
+       -c INT        skip seeds with more than INT occurrences [500]
+       -D FLOAT      drop chains shorter than FLOAT fraction of the longest overlapping chain [0.50]
+       -W INT        discard a chain if seeded bases shorter than INT [0]
+       -m INT        perform at most INT rounds of mate rescues for each read [50]
+       -S            skip mate rescue
+       -P            skip pairing; mate rescue performed unless -S also in use
+
+Scoring options:
+
+       -A INT        score for a sequence match, which scales options -TdBOELU unless overridden [1]
+       -B INT        penalty for a mismatch [4]
+       -O INT[,INT]  gap open penalties for deletions and insertions [6,6]
+       -E INT[,INT]  gap extension penalty; a gap of size k cost '{-O} + {-E}*k' [1,1]
+       -L INT[,INT]  penalty for 5'- and 3'-end clipping [5,5]
+       -U INT        penalty for an unpaired read pair [17]
+
+       -x STR        read type. Setting -x changes multiple parameters unless overridden [null]
+                     pacbio: -k17 -W40 -r10 -A1 -B1 -O1 -E1 -L0  (PacBio reads to ref)
+                     ont2d: -k14 -W20 -r10 -A1 -B1 -O1 -E1 -L0  (Oxford Nanopore 2D-reads to ref)
+                     intractg: -B9 -O16 -L5  (intra-species contigs to ref)
+
+Input/output options:
+
+       -p            smart pairing (ignoring in2.fq)
+       -R STR        read group header line such as '@RG\tID:foo\tSM:bar' [null]
+       -H STR/FILE   insert STR to header if it starts with @; or insert lines in FILE [null]
+       -o FILE       sam file to output results to [stdout]
+       -j            treat ALT contigs as part of the primary assembly (i.e. ignore <idxbase>.alt file)
+       -5            for split alignment, take the alignment with the smallest coordinate as primary
+       -q            don't modify mapQ of supplementary alignments
+       -K INT        process INT input bases in each batch regardless of nThreads (for reproducibility) []
+
+       -v INT        verbosity level: 1=error, 2=warning, 3=message, 4+=debugging [3]
+       -T INT        minimum score to output [30]
+       -h INT[,INT]  if there are <INT hits with score >80% of the max score, output all in XA [5,200]
+       -a            output all alignments for SE or unpaired PE
+       -C            append FASTA/FASTQ comment to SAM output
+       -V            output the reference FASTA header in the XR tag
+       -Y            use soft clipping for supplementary alignments
+       -M            mark shorter split hits as secondary
+
+       -I FLOAT[,FLOAT[,INT[,INT]]]
+                     specify the mean, standard deviation (10% of the mean if absent), max
+                     (4 sigma from the mean if absent) and min of the insert size distribution.
+                     FR orientation only. [inferred]
+
+Note: Please read the man page for detailed description of the command line and options.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# The reference index, BWA will generate several files in ~/ngs_course/dnaseq/data/reference/ directory
+# For making the index step, we have to generate the following steps of different commands: 
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ mkdir -p ~/ngs_course/dnaseq/data/reference
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ mv ~/ngs_course/dnaseq/data/hg19.fa.gz ~/ngs_course/dnaseq/data/reference/
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ bwa index ~/ngs_course/dnaseq/data/reference/hg19.fa.gz
+[bwa_index] Pack FASTA... 38.24 sec
+[bwa_index] Construct BWT for the packed sequence...
+[BWTIncCreate] textLength=6274322528, availableWord=453484340
+[BWTIncConstructFromPacked] 10 iterations done. 100000000 characters processed.
+[BWTIncConstructFromPacked] 20 iterations done. 200000000 characters processed.
+[BWTIncConstructFromPacked] 30 iterations done. 300000000 characters processed.
+[BWTIncConstructFromPacked] 40 iterations done. 400000000 characters processed.
+[BWTIncConstructFromPacked] 50 iterations done. 500000000 characters processed.
+[BWTIncConstructFromPacked] 60 iterations done. 600000000 characters processed.
+[BWTIncConstructFromPacked] 70 iterations done. 700000000 characters processed.
+[BWTIncConstructFromPacked] 80 iterations done. 800000000 characters processed.
+[BWTIncConstructFromPacked] 90 iterations done. 900000000 characters processed.
+[BWTIncConstructFromPacked] 100 iterations done. 1000000000 characters processed.
+[BWTIncConstructFromPacked] 110 iterations done. 1100000000 characters processed.
+[BWTIncConstructFromPacked] 120 iterations done. 1200000000 characters processed.
+[BWTIncConstructFromPacked] 130 iterations done. 1300000000 characters processed.
+[BWTIncConstructFromPacked] 140 iterations done. 1400000000 characters processed.
+[BWTIncConstructFromPacked] 150 iterations done. 1500000000 characters processed.
+[BWTIncConstructFromPacked] 160 iterations done. 1600000000 characters processed.
+[BWTIncConstructFromPacked] 170 iterations done. 1700000000 characters processed.
+[BWTIncConstructFromPacked] 180 iterations done. 1800000000 characters processed.
+[BWTIncConstructFromPacked] 190 iterations done. 1900000000 characters processed.
+[BWTIncConstructFromPacked] 200 iterations done. 2000000000 characters processed.
+[BWTIncConstructFromPacked] 210 iterations done. 2100000000 characters processed.
+[BWTIncConstructFromPacked] 220 iterations done. 2200000000 characters processed.
+[BWTIncConstructFromPacked] 230 iterations done. 2300000000 characters processed.
+[BWTIncConstructFromPacked] 240 iterations done. 2400000000 characters processed.
+[BWTIncConstructFromPacked] 250 iterations done. 2500000000 characters processed.
+[BWTIncConstructFromPacked] 260 iterations done. 2600000000 characters processed.
+[BWTIncConstructFromPacked] 270 iterations done. 2700000000 characters processed.
+[BWTIncConstructFromPacked] 280 iterations done. 2800000000 characters processed.
+[BWTIncConstructFromPacked] 290 iterations done. 2900000000 characters processed.
+[BWTIncConstructFromPacked] 300 iterations done. 3000000000 characters processed.
+[BWTIncConstructFromPacked] 310 iterations done. 3100000000 characters processed.
+[BWTIncConstructFromPacked] 320 iterations done. 3200000000 characters processed.
+[BWTIncConstructFromPacked] 330 iterations done. 3300000000 characters processed.
+[BWTIncConstructFromPacked] 340 iterations done. 3400000000 characters processed.
+[BWTIncConstructFromPacked] 350 iterations done. 3500000000 characters processed.
+[BWTIncConstructFromPacked] 360 iterations done. 3600000000 characters processed.
+[BWTIncConstructFromPacked] 370 iterations done. 3700000000 characters processed.
+[BWTIncConstructFromPacked] 380 iterations done. 3800000000 characters processed.
+[BWTIncConstructFromPacked] 390 iterations done. 3900000000 characters processed.
+[BWTIncConstructFromPacked] 400 iterations done. 4000000000 characters processed.
+[BWTIncConstructFromPacked] 410 iterations done. 4100000000 characters processed.
+[BWTIncConstructFromPacked] 420 iterations done. 4200000000 characters processed.
+[BWTIncConstructFromPacked] 430 iterations done. 4300000000 characters processed.
+[BWTIncConstructFromPacked] 440 iterations done. 4400000000 characters processed.
+[BWTIncConstructFromPacked] 450 iterations done. 4500000000 characters processed.
+[BWTIncConstructFromPacked] 460 iterations done. 4600000000 characters processed.
+[BWTIncConstructFromPacked] 470 iterations done. 4700000000 characters processed.
+[BWTIncConstructFromPacked] 480 iterations done. 4800000000 characters processed.
+[BWTIncConstructFromPacked] 490 iterations done. 4900000000 characters processed.
+[BWTIncConstructFromPacked] 500 iterations done. 5000000000 characters processed.
+[BWTIncConstructFromPacked] 510 iterations done. 5100000000 characters processed.
+[BWTIncConstructFromPacked] 520 iterations done. 5200000000 characters processed.
+[BWTIncConstructFromPacked] 530 iterations done. 5300000000 characters processed.
+[BWTIncConstructFromPacked] 540 iterations done. 5400000000 characters processed.
+[BWTIncConstructFromPacked] 550 iterations done. 5500000000 characters processed.
+[BWTIncConstructFromPacked] 560 iterations done. 5600000000 characters processed.
+[BWTIncConstructFromPacked] 570 iterations done. 5694239600 characters processed.
+[BWTIncConstructFromPacked] 580 iterations done. 5777996048 characters processed.
+[BWTIncConstructFromPacked] 590 iterations done. 5852434944 characters processed.
+[BWTIncConstructFromPacked] 600 iterations done. 5918592432 characters processed.
+[BWTIncConstructFromPacked] 610 iterations done. 5977389360 characters processed.
+[BWTIncConstructFromPacked] 620 iterations done. 6029644208 characters processed.
+[BWTIncConstructFromPacked] 630 iterations done. 6076084432 characters processed.
+[BWTIncConstructFromPacked] 640 iterations done. 6117356576 characters processed.
+[BWTIncConstructFromPacked] 650 iterations done. 6154035344 characters processed.
+[BWTIncConstructFromPacked] 660 iterations done. 6186631520 characters processed.
+[BWTIncConstructFromPacked] 670 iterations done. 6215599040 characters processed.
+[BWTIncConstructFromPacked] 680 iterations done. 6241341392 characters processed.
+[BWTIncConstructFromPacked] 690 iterations done. 6264217232 characters processed.
+[bwt_gen] Finished constructing BWT in 695 iterations.
+[bwa_index] 3207.93 seconds elapse.
+[bwa_index] Update BWT... 19.20 sec
+[bwa_index] Pack forward-only FASTA... 30.46 sec
+[bwa_index] Construct SA from BWT and Occ...
+1120.63 sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa index /home/ubuntu/ngs_course/dnaseq/data/reference/hg19.fa.gz
+[main] Real time: 4496.580 sec; CPU: 4416.456 sec
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+# To list the different type of references. we run the command below:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ ls ~/ngs_course/dnaseq/data/reference
+hg19.fa.gz  hg19.fa.gz.amb  hg19.fa.gz.ann  hg19.fa.gz.bwt  hg19.fa.gz.pac  hg19.fa.gz.sa
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# For read group (RG) information, run bwa mem with RG information using the following commands:
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/untrimmed_fastq$ mkdir ~/ngs_course/dnaseq/data/aligned_data
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ bwa mem -t 4 -v 1 -R '@RG\tID:11V6WR1.111.HD1375ACXX.1.NGS0001\tSM:NGS0001\tPL:ILLUMINA\tLB:nextera\tDT:2017-02-28\tPU:11V6WR1' -I 250,50  ~/ngs_course/dnaseq/data/reference/hg19.fa.gz ~/ngs_course/dnaseq/data/trimmed_fastq/NGS0001_trimmed_R_1P ~/ngs_course/dnaseq/data/trimmed_fastq/NGS0001_trimmed_R_2P > ~/ngs_course/dnaseq/data/aligned_data/NGS0001.sam
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa mem -t 4 -v 1 -R @RG\tID:11V6WR1.111.HD1375ACXX.1.NGS0001\tSM:NGS0001\tPL:ILLUMINA\tLB:nextera\tDT:2017-02-28\tPU:11V6WR1 -I 250,50 /home/ubuntu/ngs_course/dnaseq/data/reference/hg19.fa.gz /home/ubuntu/ngs_course/dnaseq/data/trimmed_fastq/NGS0001_trimmed_R_1P /home/ubuntu/ngs_course/dnaseq/data/trimmed_fastq/NGS0001_trimmed_R_2P
+[main] Real time: 690.079 sec; CPU: 2717.604 sec
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# To change directory into aligned_data, we used the commands below and will help us to convert sam file to bam file format, sort it and generate an index using samtools:
+(base) ubuntu@mai:~$ cd ~/ngs_course/dnaseq/data/aligned_data
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools view -h -b NGS0001.sam > NGS0001.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools view -h -b -s NGS0001.sam > NGS0001.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools sort NGS0001.bam NGS0001_sorted.bam
+[bam_sort] Use -T PREFIX / -o FILE to specify temporary and final output files
+Usage: samtools sort [options...] [in.bam]
+Options:
+  -l INT     Set compression level, from 0 (uncompressed) to 9 (best)
+  -m INT     Set maximum memory per thread; suffix K/M/G recognized [768M]
+  -n         Sort by read name
+  -t TAG     Sort by value of TAG. Uses position as secondary index (or read name if -n is set)
+  -o FILE    Write final output to FILE rather than standard output
+  -T PREFIX  Write temporary files to PREFIX.nnnn.bam
+      --input-fmt-option OPT[=VAL]
+               Specify a single input file format option in the form
+               of OPTION or OPTION=VALUE
+  -O, --output-fmt FORMAT[,OPT[=VAL]]...
+               Specify output format (SAM, BAM, CRAM)
+      --output-fmt-option OPT[=VAL]
+               Specify a single output file format option in the form
+               of OPTION or OPTION=VALUE
+      --reference FILE
+               Reference sequence FASTA FILE [null]
+  -@, --threads INT
+               Number of additional threads to use [0]
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+NGS0001.bam  NGS0001.sam  NGS0001_sorted.bam  NGS0001_sorted.sam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data/NGS0001_sorted.bam$ cd
+(base) ubuntu@mai:~$ source ~/.bashrc
+(base) ubuntu@mai:~$ conda install samtools
+Collecting package metadata (current_repodata.json): done
+Solving environment: done
+
+# All requested packages already installed.
+
+(base) ubuntu@mai:~$ conda install bwa
+Collecting package metadata (current_repodata.json): done
+Solving environment: done
+
+# All requested packages already installed.
+
+(base) ubuntu@mai:~$ conda install picard
+Collecting package metadata (current_repodata.json): done
+Solving environment: done
+
+# All requested packages already installed.
+
+(base) ubuntu@mai:~$ conda install trimmomatic
+Collecting package metadata (current_repodata.json): done
+Solving environment: done
+
+# All requested packages already installed.
+
+(base) ubuntu@mai:~$ ls
+anaconda3  Anaconda3-2020.02-Linux-x86_64.sh  NGS0001.R1.fastq.qz_fastqc.html  ngs_course  README.txt
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools sort NGS0001.bam > NGS0001.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools index NGS0001.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+NGS0001.bam  NGS0001.bam.bai  NGS0001.sam  NGS0001_sorted.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+NGS0001.bam  NGS0001.sam  NGS0001_sorted.bam  NGS0001_sorted.sam  sorted.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ cd ~/ngs_course/dnaseq/data/aligned_data/NGS0001_sorted.bam
+(base) ubuntu@mai:~$ ls
+anaconda3  Anaconda3-2020.02-Linux-x86_64.sh  NGS0001.R1.fastq.qz_fastqc.html  ngs_course  README.txt
+(base) ubuntu@mai:~$ cd ~/ngs_course/dnaseq/data/aligned_data
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+NGS0001.bam  NGS0001.sam  NGS0001_sorted.bam  NGS0001_sorted.sam  sorted.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools sort NGS0001.bam > NGS0001_sorted.bam
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools index NGS0001_sorted.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+NGS0001.bam  NGS0001_sorted.bam  NGS0001_sorted.bam.bai
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# The commands below are used for post alignment quality control (QC) and filtering. There are 2 steps: 
+(1) Using Picard tools to mark duplicated reads and (2) Filtering bam data
+# We use Picard tools to mark duplicated reads. This tool examines aligned records in the sam and bam file, where can locate duplicate molecules. All records are then written to the output file with the duplicate records flagged. Two files are generated one is the new bam file with duplicate reads marked and the second is a metrics file summarising the number of duplicate reads found.
+# We have to mark duplicates first and then filtering the bam file data.
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ picard MarkDuplicates I=NGS0001_sorted.bam O=NGS0001_sorted_marked.bam M=marked_dup_metrics.txt
+INFO    2021-04-07 23:50:38     MarkDuplicates
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    MarkDuplicates -I NGS0001_sorted.bam -O NGS0001_sorted_marked.bam -M marked_dup_metrics.txt
+**********
+
+
+23:50:38.604 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/ubuntu/anaconda3/share/picard-2.25.1-0/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Wed Apr 07 23:50:38 UTC 2021] MarkDuplicates INPUT=[NGS0001_sorted.bam] OUTPUT=NGS0001_sorted_marked.bam METRICS_FILE=marked_dup_metrics.txt    MAX_SEQUENCES_FOR_DISK_READ_ENDS_MAP=50000 MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=8000 SORTING_COLLECTION_SIZE_RATIO=0.25 TAG_DUPLICATE_SET_MEMBERS=false REMOVE_SEQUENCING_DUPLICATES=false TAGGING_POLICY=DontTag CLEAR_DT=true DUPLEX_UMI=false ADD_PG_TAG_TO_READS=true REMOVE_DUPLICATES=false ASSUME_SORTED=false DUPLICATE_SCORING_STRATEGY=SUM_OF_BASE_QUALITIES PROGRAM_RECORD_ID=MarkDuplicates PROGRAM_GROUP_NAME=MarkDuplicates READ_NAME_REGEX=<optimized capture of last three ':' separated fields as numeric values> OPTICAL_DUPLICATE_PIXEL_DISTANCE=100 MAX_OPTICAL_DUPLICATE_SET_SIZE=300000 VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+INFO    2021-04-07 23:50:38     MarkDuplicates  Start of doWork freeMemory: 501970104; totalMemory: 514850816; maxMemory: 1908932608
+INFO    2021-04-07 23:50:38     MarkDuplicates  Reading input file and constructing read end information.
+INFO    2021-04-07 23:50:38     MarkDuplicates  Will retain up to 6916422 data points before spilling to disk.
+INFO    2021-04-07 23:50:43     MarkDuplicates  Read     1,000,000 records.  Elapsed time: 00:00:05s.  Time for last 1,000,000:    5s.  Last read position: chr1:146,731,595
+INFO    2021-04-07 23:50:43     MarkDuplicates  Tracking 505 as yet unmatched pairs. 38 records in RAM.
+INFO    2021-04-07 23:50:47     MarkDuplicates  Read     2,000,000 records.  Elapsed time: 00:00:08s.  Time for last 1,000,000:    3s.  Last read position: chr2:54,365,866
+INFO    2021-04-07 23:50:47     MarkDuplicates  Tracking 860 as yet unmatched pairs. 50 records in RAM.
+INFO    2021-04-07 23:50:51     MarkDuplicates  Read     3,000,000 records.  Elapsed time: 00:00:12s.  Time for last 1,000,000:    4s.  Last read position: chr2:211,507,080
+INFO    2021-04-07 23:50:51     MarkDuplicates  Tracking 1389 as yet unmatched pairs. 22 records in RAM.
+INFO    2021-04-07 23:50:54     MarkDuplicates  Read     4,000,000 records.  Elapsed time: 00:00:16s.  Time for last 1,000,000:    3s.  Last read position: chr3:179,605,330
+INFO    2021-04-07 23:50:54     MarkDuplicates  Tracking 1687 as yet unmatched pairs. 23 records in RAM.
+INFO    2021-04-07 23:50:59     MarkDuplicates  Read     5,000,000 records.  Elapsed time: 00:00:20s.  Time for last 1,000,000:    4s.  Last read position: chr5:37,438,042
+INFO    2021-04-07 23:50:59     MarkDuplicates  Tracking 2132 as yet unmatched pairs. 112 records in RAM.
+INFO    2021-04-07 23:51:02     MarkDuplicates  Read     6,000,000 records.  Elapsed time: 00:00:23s.  Time for last 1,000,000:    3s.  Last read position: chr6:56,407,916
+INFO    2021-04-07 23:51:02     MarkDuplicates  Tracking 2315 as yet unmatched pairs. 85 records in RAM.
+INFO    2021-04-07 23:51:09     MarkDuplicates  Read     7,000,000 records.  Elapsed time: 00:00:30s.  Time for last 1,000,000:    7s.  Last read position: chr7:99,489,887
+INFO    2021-04-07 23:51:09     MarkDuplicates  Tracking 2556 as yet unmatched pairs. 57 records in RAM.
+INFO    2021-04-07 23:51:13     MarkDuplicates  Read     8,000,000 records.  Elapsed time: 00:00:34s.  Time for last 1,000,000:    3s.  Last read position: chrX:119,246,686
+INFO    2021-04-07 23:51:13     MarkDuplicates  Tracking 2693 as yet unmatched pairs. 55 records in RAM.
+INFO    2021-04-07 23:51:16     MarkDuplicates  Read     9,000,000 records.  Elapsed time: 00:00:37s.  Time for last 1,000,000:    3s.  Last read position: chr9:35,299,926
+INFO    2021-04-07 23:51:16     MarkDuplicates  Tracking 2691 as yet unmatched pairs. 301 records in RAM.
+INFO    2021-04-07 23:51:20     MarkDuplicates  Read    10,000,000 records.  Elapsed time: 00:00:41s.  Time for last 1,000,000:    3s.  Last read position: chr10:51,610,297
+INFO    2021-04-07 23:51:20     MarkDuplicates  Tracking 2667 as yet unmatched pairs. 207 records in RAM.
+INFO    2021-04-07 23:51:24     MarkDuplicates  Read    11,000,000 records.  Elapsed time: 00:00:45s.  Time for last 1,000,000:    4s.  Last read position: chr11:76,813,979
+INFO    2021-04-07 23:51:24     MarkDuplicates  Tracking 2466 as yet unmatched pairs. 72 records in RAM.
+INFO    2021-04-07 23:51:27     MarkDuplicates  Read    12,000,000 records.  Elapsed time: 00:00:49s.  Time for last 1,000,000:    3s.  Last read position: chr12:123,082,495
+INFO    2021-04-07 23:51:27     MarkDuplicates  Tracking 2290 as yet unmatched pairs. 38 records in RAM.
+INFO    2021-04-07 23:51:31     MarkDuplicates  Read    13,000,000 records.  Elapsed time: 00:00:52s.  Time for last 1,000,000:    3s.  Last read position: chr15:28,599,640
+INFO    2021-04-07 23:51:31     MarkDuplicates  Tracking 2147 as yet unmatched pairs. 256 records in RAM.
+INFO    2021-04-07 23:51:40     MarkDuplicates  Read    14,000,000 records.  Elapsed time: 00:01:02s.  Time for last 1,000,000:    9s.  Last read position: chr16:29,367,105
+INFO    2021-04-07 23:51:40     MarkDuplicates  Tracking 1909 as yet unmatched pairs. 229 records in RAM.
+INFO    2021-04-07 23:51:44     MarkDuplicates  Read    15,000,000 records.  Elapsed time: 00:01:05s.  Time for last 1,000,000:    3s.  Last read position: chr17:56,332,125
+INFO    2021-04-07 23:51:44     MarkDuplicates  Tracking 1640 as yet unmatched pairs. 93 records in RAM.
+INFO    2021-04-07 23:51:47     MarkDuplicates  Read    16,000,000 records.  Elapsed time: 00:01:08s.  Time for last 1,000,000:    3s.  Last read position: chr19:9,070,462
+INFO    2021-04-07 23:51:47     MarkDuplicates  Tracking 1008 as yet unmatched pairs. 282 records in RAM.
+INFO    2021-04-07 23:51:51     MarkDuplicates  Read    17,000,000 records.  Elapsed time: 00:01:12s.  Time for last 1,000,000:    3s.  Last read position: chr21:15,678,141
+INFO    2021-04-07 23:51:51     MarkDuplicates  Tracking 501 as yet unmatched pairs. 91 records in RAM.
+INFO    2021-04-07 23:51:52     MarkDuplicates  Read 17355466 records. 0 pairs never matched.
+INFO    2021-04-07 23:51:54     MarkDuplicates  After buildSortedReadEndLists freeMemory: 1404498640; totalMemory: 1421344768; maxMemory: 1908932608
+INFO    2021-04-07 23:51:54     MarkDuplicates  Will retain up to 59654144 duplicate indices before spilling to disk.
+INFO    2021-04-07 23:51:54     MarkDuplicates  Traversing read pair information and detecting duplicates.
+INFO    2021-04-07 23:51:58     MarkDuplicates  Traversing fragment information and detecting duplicates.
+INFO    2021-04-07 23:52:02     MarkDuplicates  Sorting list of duplicate records.
+INFO    2021-04-07 23:52:02     MarkDuplicates  After generateDuplicateIndexes freeMemory: 923230680; totalMemory: 1417150464; maxMemory: 1908932608
+INFO    2021-04-07 23:52:02     MarkDuplicates  Marking 414154 records as duplicates.
+INFO    2021-04-07 23:52:02     MarkDuplicates  Found 994 optical duplicate clusters.
+INFO    2021-04-07 23:52:02     MarkDuplicates  Reads are assumed to be ordered by: coordinate
+INFO    2021-04-07 23:53:32     MarkDuplicates  Written    10,000,000 records.  Elapsed time: 00:01:29s.  Time for last 10,000,000:   89s.  Last read position: chr10:51,610,297
+INFO    2021-04-07 23:54:39     MarkDuplicates  Writing complete. Closing input iterator.
+INFO    2021-04-07 23:54:39     MarkDuplicates  Duplicate Index cleanup.
+INFO    2021-04-07 23:54:39     MarkDuplicates  Getting Memory Stats.
+INFO    2021-04-07 23:54:39     MarkDuplicates  Before output close freeMemory: 1441495216; totalMemory: 1460142080; maxMemory: 1908932608
+INFO    2021-04-07 23:54:39     MarkDuplicates  Closed outputs. Getting more Memory Stats.
+INFO    2021-04-07 23:54:39     MarkDuplicates  After output close freeMemory: 1441783632; totalMemory: 1460142080; maxMemory: 1908932608
+[Wed Apr 07 23:54:39 UTC 2021] picard.sam.markduplicates.MarkDuplicates done. Elapsed time: 4.01 minutes.
+Runtime.totalMemory()=1460142080
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+marked_dup_metrics.txt  NGS0001.bam  NGS0001_sorted.bam  NGS0001_sorted.bam.bai  NGS0001_sorted_marked.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools index NGS0001_sorted_marked.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+marked_dup_metrics.txt  NGS0001.bam  NGS0001_sorted.bam  NGS0001_sorted.bam.bai  NGS0001_sorted_marked.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools index NGS0001_sorted_marked.bam
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# Filtering bam data dependent on mapping quality and bitwise flags using samtools:
+# Filtering is based on different criteria:
+# Minimum MAPQ quality score : 20 -Filter on bitwise flag. Skip alignments with any of these flag bits because of: (1) The read is unmapped (2) The alignment or this read is not primary alignment (3) The read fails platform/vendor quality checks (4) The read is a PCR or optical duplicate (5) Supplementary alignment required
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools view -F 1796  -q 20 -o NGS0001_sorted_filtered.bam NGS0001_sort
+ed_marked.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+marked_dup_metrics.txt  NGS0001_sorted.bam      NGS0001_sorted_filtered.bam  NGS0001_sorted_marked.bam.bai
+NGS0001.bam             NGS0001_sorted.bam.bai  NGS0001_sorted_marked.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ samtools index NGS0001_sorted_filtered.bam
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ ls
+marked_dup_metrics.txt  NGS0001_sorted.bam      NGS0001_sorted_filtered.bam      NGS0001_sorted_marked.bam
+NGS0001.bam             NGS0001_sorted.bam.bai  NGS0001_sorted_filtered.bam.bai  NGS0001_sorted_marked.bam.bai
+
+(base) ubuntu@mai:~/ngs_course/dnaseq/data/aligned_data$ conda install vcflib
+Collecting package metadata (current_repodata.json): done
+Solving environment: done
+
+## Package Plan ##
+
+  environment location: /home/ubuntu/anaconda3
+
+  added / updated specs:
+    - vcflib
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    conda-4.10.0               |   py37h06a4308_0         2.9 MB
+    ------------------------------------------------------------
+                                           Total:         2.9 MB
+
+The following packages will be UPDATED:
+
+  conda                                4.9.2-py37h06a4308_0 --> 4.10.0-py37h06a4308_0
+
+
+Proceed ([y]/n)? y
+
+
+Downloading and Extracting Packages
+conda-4.10.0         | 2.9 MB    | ###################################################################################### | 100%
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
